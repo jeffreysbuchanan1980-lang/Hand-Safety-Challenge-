@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hand Safety Challenge</title>
+<style>
+:root{--navy:#071a33;--blue:#0c3b73;--yellow:#ffd21c;--green:#39b54a;--red:#e53935;--white:#fff;--ink:#07111f}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:linear-gradient(#071a33,#0b2b52);color:#fff;min-height:100vh}
+.wrap{max-width:900px;margin:auto;padding:14px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.pill{background:#031225;border:2px solid #194b7c;padding:9px 14px;border-radius:999px;font-weight:900}
+.bar{height:12px;background:#031225;border-radius:99px;overflow:hidden;margin:8px 0 14px;border:1px solid #28527d}.bar div{height:100%;background:linear-gradient(90deg,#7ac943,#ffd21c);width:0}
+.card{background:#0b2d56;border:3px solid #163f70;border-radius:24px;padding:22px;box-shadow:0 12px 35px #0007}.hidden{display:none!important}
+.hero{text-align:center;padding:16px;overflow:hidden}.heroimg{width:100%;border-radius:18px;border:3px solid #ffd21c;display:block;max-height:480px;object-fit:cover}
+h1{font-size:clamp(38px,7vw,62px);line-height:.95;margin:16px 0 8px;text-shadow:0 4px 0 #000}h2{font-size:clamp(28px,4.8vw,42px);margin:5px 0 8px}
+p{font-size:clamp(18px,2.6vw,23px);line-height:1.4;color:#e5eef8}
+.btn,button.answer{width:100%;border:0;border-radius:16px;padding:17px 18px;font-size:20px;font-weight:900;margin:7px 0;cursor:pointer}
+.btn{background:linear-gradient(#73d148,#2da83d);color:#07210d;border:3px solid #123f16;box-shadow:0 5px 0 #16340d}
+button.answer{background:#fff;color:#101820;text-align:left;border:3px solid #aab7c6}
+button.answer.good{background:#d8f7dc;border-color:#29a63b}.answer.bad{background:#ffd8d7;border-color:#e53935}
+.mascot{display:flex;align-items:center;gap:14px;background:#061d38;border:2px solid #1f5c97;border-radius:18px;padding:12px;margin:12px 0}
+.mascot .face{font-size:52px}.mascot b{color:#ffd21c}.feedback{padding:14px;border-radius:14px;margin-top:10px;font-size:18px;font-weight:800}
+.green{background:#155d2a;border:2px solid #39b54a}.red{background:#6b1e1c;border:2px solid #e53935}
+.badge{display:inline-block;background:#ffd21c;color:#111;padding:6px 11px;border-radius:999px;font-weight:900;margin-bottom:8px}
+.resultScore{font-size:78px;font-weight:1000;color:#ffd21c;text-shadow:0 5px 0 #000}
+input{width:100%;padding:15px;border-radius:14px;border:2px solid #7fa3c8;background:#041426;color:#fff;font-size:20px}
+.leader{margin-top:16px;text-align:left}.leader div{display:flex;justify-content:space-between;border-bottom:1px solid #396287;padding:8px}
+.slogan{font-weight:1000;color:#ffd21c;font-size:22px}
+.small{font-size:14px;color:#afc8e1}.hazard{background:#ffd21c;color:#111;padding:10px 13px;border-radius:12px;font-weight:900;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div class="pill">🖐️ HAND SAFETY</div><div class="pill" id="score">Score: 0</div></div>
+<div class="bar"><div id="bar"></div></div>
+
+<section id="start" class="card hero">
+<img class="heroimg" src="hand-safety-cartoon.png" alt="Cartoon Hand Safety Challenge workers">
+<div class="badge">SAFETY DAY CHALLENGE</div>
+<h1>Save Your Hands!</h1>
+<p class="slogan">SAFE HANDS. STRONG TEAM.</p>
+<p>12 tougher scenarios about pinch points, stored energy, glove tradeoffs, line-of-fire hazards and safe decision-making.</p>
+<button class="btn" onclick="go()">▶ PLAY CHALLENGE</button>
+<div class="hazard">⚠️ Think before you use your hands.</div>
+<p class="small">Training aid only. Follow your site's approved PPE, guarding and energy-control/LOTO procedures.</p>
+</section>
+
+<section id="game" class="card hidden">
+<div id="mascot" class="mascot"><div class="face">👷‍♂️</div><div><b>Safety Sam says:</b><br><span id="tip">Keep your hands out of the line of fire.</span></div></div>
+<h2 id="qtitle"></h2>
+<p id="qtext"></p>
+<div id="answers"></div>
+<div id="feedback" class="feedback hidden"></div>
+<button id="next" class="btn hidden" onclick="nextQ()">NEXT QUESTION →</button>
+</section>
+
+<section id="result" class="card hero hidden">
+<div style="font-size:90px">🏆🧤</div>
+<h2>Challenge Complete!</h2>
+<div class="resultScore" id="final"></div>
+<h2 id="rank"></h2>
+<p id="resultMsg"></p>
+<p class="slogan">THINK SAFE. WORK SAFE. GO HOME SAFE.</p>
+<input id="name" placeholder="Optional: enter your name">
+<button class="btn" onclick="saveScore()">SAVE SCORE</button>
+<div id="leader" class="leader"></div>
+<button class="btn" onclick="location.reload()">PLAY AGAIN</button>
+</section>
+</div>
+
+<script>
+const qs=[
+["Unexpected Stop ⚙️","A machine stops unexpectedly with a part caught near a pinch point. The operator says the machine is off. What should happen before anyone reaches in?",["Press the stop button again","Have another associate watch the controls","Follow the required energy-control/LOTO procedure and verify hazardous energy is controlled","Wear cut-resistant gloves and remove the part"],2,"Correct — 'off' is not the same as safely controlled. Follow the required energy-control/LOTO procedure and verify hazardous energy before entering the danger zone.","Never assume a stopped machine is safe."],
+["Glove Tradeoff 🧤","You need to handle a sharp-edged part near exposed rotating equipment. What is the best decision?",["Wear the thickest glove available","Use the glove required for cut protection even if it could snag","Follow the task-specific procedure and control both cut and entanglement hazards before starting","Skip gloves because rotating equipment is nearby"],2,"Correct — you must control both hazards. The task-specific procedure determines whether gloves are appropriate and what other controls are needed.","One hazard control should never create a new hazard."],
+["Hidden Pinch Point 🤏","Two associates are sliding a heavy fixture into position. Which hand placement is safest?",["Hands on the outside edges with fingers clear of the mating surfaces","Fingers underneath so you can feel when it seats","One hand on the fixture and one hand on the fixed stop","Hands close to the alignment pins for better control"],0,"Correct — keep hands on controlled, outside surfaces and away from mating points, stops, pins and crush zones.","Know where your hands will go before the part moves."],
+["Stored Energy 🔋","Maintenance has shut down a machine, but a raised component could still fall under gravity. What additional hazard must be controlled before work begins?",["Only electrical energy","Stored or potential energy, including gravity","No additional hazard if the power light is off","Only pneumatic pressure"],1,"Correct — hazardous energy includes more than electricity. Gravity, pressure, springs and other stored energy may also require control.","Energy can still exist after the power is off."],
+["Right Tool, Right Time 🔧","A small metal chip is stuck in a tight area. What is the best approach?",["Use your fingers if the machine is stopped","Blow it out with compressed air","Use the approved tool and method while keeping hands out of the hazard area","Wear two pairs of gloves and pull it out"],2,"Correct — use the approved tool and method instead of placing fingers into a hazardous area.","Tools are replaceable. Fingers are not."],
+["Damaged PPE 🧤","Your cut-resistant glove has a small tear, but the task will only take 30 seconds. What should you do?",["Finish the quick task, then replace it","Put a disposable glove over it","Replace the damaged glove before continuing","Use your other hand for the sharp part"],2,"Correct — damaged PPE may not provide its intended protection, regardless of how short the task is.","Short jobs can still cause permanent injuries."],
+["Line of Fire 🎯","An associate is holding a part while another person uses a tool to free a stuck component. What is the biggest concern?",["The tool may scratch the part","The associate's hand may be in the line of fire if the component suddenly releases","The job may take too long","The gloves may get dirty"],1,"Correct — sudden movement, tool slip or release can put hands directly in the line of fire.","Ask: where will the energy go if it suddenly releases?"],
+["Falling Part 📦","A 20-pound component begins slipping from a work surface. What is the safest response?",["Try to catch it with both hands","Use one gloved hand to slow it down","Move clear and let it fall if catching it would create a crush or pinch risk","Trap it against your body"],2,"Correct — do not turn a dropped part into a hand or crush injury. Move clear when catching it is unsafe.","Parts can be replaced. Hands cannot."],
+["Sharp Edge Control ✂️","A recurring burr keeps appearing on parts from the same process. What is the best long-term response?",["Tell employees to be more careful","Require thicker gloves only","Correct or control the source of the burr and use appropriate PPE until the hazard is eliminated or reduced","Let each shift decide how to handle it"],2,"Correct — PPE matters, but eliminating or controlling the hazard at its source is stronger than relying only on behavior or gloves.","The best fix is often upstream of the injury."],
+["Production Pressure ⏱️","Production is behind schedule and a jam happens again. What is the best hand-safety decision?",["Use a faster shortcut if an experienced operator approves","Follow the required safe procedure even if it delays production","Reach in only if the part is visible","Use a tool to bypass the guard"],1,"Correct — production pressure never changes the required safe procedure.","No schedule is worth a hand injury."],
+["Two-Hand Control 👐","A machine requires two-hand controls to initiate a cycle. Why is bypassing one control especially dangerous?",["It increases cycle time","It can place one hand back into the hazard area during machine motion","It causes more paperwork","It may wear out the other button"],1,"Correct — the two-hand control is designed to keep both hands away from the hazard during initiation.","Safeguards are there to control predictable human movement."],
+["Final Challenge ✋","You notice an unsafe hand position that has become 'normal' because no one has been hurt yet. What is the best response?",["Leave it alone because the method has worked so far","Wait until the next safety meeting","Stop and address the unsafe condition or behavior using the site's safety process","Only say something if a supervisor is nearby"],2,"Correct — a lack of past injuries does not make an unsafe condition safe. Address it before someone gets hurt.","Safe today does not mean safe by luck."]
+];
+let i=0,score=0,locked=false;
+function go(){document.getElementById('start').classList.add('hidden');document.getElementById('game').classList.remove('hidden');showQ()}
+function showQ(){
+ locked=false;
+ document.getElementById('feedback').classList.add('hidden');
+ document.getElementById('next').classList.add('hidden');
+ const q=qs[i];
+ document.getElementById('qtitle').textContent=(i+1)+". "+q[0];
+ document.getElementById('qtext').textContent=q[1];
+ document.getElementById('tip').textContent=q[5];
+ document.getElementById('mascot').querySelector('.face').textContent=i%2===0?'👷‍♂️':'👷‍♀️';
+ let a=document.getElementById('answers');a.innerHTML='';
+ q[2].forEach((t,n)=>{let b=document.createElement('button');b.className='answer';b.textContent=String.fromCharCode(65+n)+". "+t;b.onclick=()=>pick(b,n);a.appendChild(b)});
+ document.getElementById('bar').style.width=((i+1)/qs.length*100)+'%';
+}
+function pick(b,n){
+ if(locked)return;locked=true;
+ document.querySelectorAll('#answers button').forEach(x=>x.disabled=true);
+ const q=qs[i],ok=n===q[3];
+ if(ok){score++;b.classList.add('good')}else{b.classList.add('bad');document.querySelectorAll('#answers button')[q[3]].classList.add('good')}
+ document.getElementById('score').textContent='Score: '+score;
+ const f=document.getElementById('feedback');f.textContent=(ok?'✅ CORRECT! ':'❌ NOT QUITE! ')+q[4];f.className='feedback '+(ok?'green':'red');
+ document.getElementById('next').classList.remove('hidden');
+}
+function nextQ(){i++;if(i<qs.length)showQ();else finish()}
+function finish(){
+ document.getElementById('game').classList.add('hidden');document.getElementById('result').classList.remove('hidden');
+ document.getElementById('final').textContent=score+'/'+qs.length;
+ let r,m;if(score===qs.length){r='🥇 HAND SAFETY MASTER';m='Perfect score! Safety Sam approves.'}
+ else if(score>=10){r='🥈 SAFETY PRO';m='Great job. Your hands are in good hands.'}
+ else if(score>=8){r='🥉 SAFETY ROOKIE';m='Good start—review the misses and try for Master.'}
+ else{r='😬 YOUR FINGERS WANT A REMATCH';m='Run it again and protect all 10.'}
+ document.getElementById('rank').textContent=r;document.getElementById('resultMsg').textContent=m;showLeader();
+}
+function saveScore(){
+ let n=document.getElementById('name').value.trim()||'Anonymous';
+ let a=JSON.parse(localStorage.getItem('handSafetyScores')||'[]');a.push({n:n,s:score});a.sort((x,y)=>y.s-x.s);
+ localStorage.setItem('handSafetyScores',JSON.stringify(a.slice(0,10)));showLeader();
+}
+function showLeader(){
+ let a=JSON.parse(localStorage.getItem('handSafetyScores')||'[]'),e=document.getElementById('leader');
+ e.innerHTML=`<h3>🏆 This iPad's Leaderboard</h3>`+(a.length?a.map((x,j)=>'<div><span>'+(j+1)+'. '+x.n.replace(/[<>]/g,'')+'</span><b>'+x.s+'/10</b></div>').join(''):'<p>No saved scores yet.</p>');
+}
+</script>
+</body></html>
